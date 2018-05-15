@@ -12,9 +12,17 @@ namespace WebLabBudgetTool
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) { }
 
+        public static string ConnectionString;
+
         internal DbSet<Account> Accounts { get; set; }
         internal DbSet<Payment> Payments { get; set; }
         internal DbSet<Category> Categories { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(ConnectionString);
+            base.OnConfiguring(optionsBuilder);
+        }
 
         /// <summary>
         ///     Called when the models are created.

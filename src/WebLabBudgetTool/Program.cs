@@ -13,6 +13,8 @@ namespace WebLabBudgetTool
 
             using (var scope = host.Services.CreateScope())
             {
+                MapperConfiguration.Init();
+
                 var services = scope.ServiceProvider;
                 services.GetRequiredService<ApplicationContext>().Database.MigrateAsync();
             }
