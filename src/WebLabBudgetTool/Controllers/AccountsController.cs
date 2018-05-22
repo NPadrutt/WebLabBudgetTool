@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using WebLabBudgetTool.DataService;
 using WebLabBudgetTool.DataTransferObjects;
 using WebLabBudgetTool.Entities;
+using System;
 
 namespace WebLabBudgetTool.Controllers
 {
     [Route("api/[controller]")]
+    [Microsoft.AspNetCore.Cors.EnableCors("CorsPolicy")]
     public class AccountsController
     {
         private readonly IAccountDataService accountDataService;
@@ -16,6 +18,13 @@ namespace WebLabBudgetTool.Controllers
         public AccountsController(IAccountDataService accountDataService)
         {
             this.accountDataService = accountDataService;
+        }
+
+        // OPTIONS api/Accounts
+        [HttpOptions]
+        public async Task<IEnumerable<AccountDto>> Options()
+        {
+            return Mapper.Map<List<AccountDto>>(await accountDataService.GetAllAccounts());
         }
 
         // GET api/Accounts

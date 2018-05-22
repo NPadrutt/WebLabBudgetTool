@@ -20,7 +20,7 @@ namespace WebLabBudgetTool
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(ConnectionString);
+            optionsBuilder.UseMySQL(ConnectionString);
             base.OnConfiguring(optionsBuilder);
         }
 

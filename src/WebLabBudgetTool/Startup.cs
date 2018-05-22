@@ -29,8 +29,7 @@ namespace WebLabBudgetTool
             // We have to set the connection string twice here to init the context afterwards correctly for the ambient context.
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             ApplicationContext.ConnectionString = connectionString;
-            services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
-            services.AddMvc();
+            services.AddDbContext<ApplicationContext>(options => options.UseMySQL(connectionString));
 
             // Create the container builder.
             var builder = new ContainerBuilder();
