@@ -39,24 +39,25 @@ namespace WebLabBudgetTool.Controllers
             return Mapper.Map<PaymentDto>(await paymentDataService.GetById(id));
         }
 
-        // POST api/Categories
         [HttpPost]
         public async Task Post([FromBody]PaymentDto paymentDto)
         {
             var payment = Mapper.Map<Payment>(paymentDto);
             payment.Id = 0;
 
+            if (paymentDto.AccountId.HasValue)
+            {
+                payment.Account = await accountDataService.GetById(paymentDto.AccountId.Value);
+            }
+
             if (paymentDto.CategoryId.HasValue)
             {
                 payment.Category = await categoryDataService.GetById(paymentDto.CategoryId.Value);
             }
-            if (paymentDto.AccountId.HasValue)
-            {
-                payment.Category = await categoryDataService.GetById(paymentDto.AccountId.Value);
-            }
-
             await paymentDataService.SavePayments(payment);
         }
+
+        // POST api/Categories
 
         // PUT api/Categories/5
         [HttpPut("{id}")]
@@ -65,15 +66,15 @@ namespace WebLabBudgetTool.Controllers
             var payment = Mapper.Map<Payment>(paymentDto);
             payment.Id = id;
 
+            if (paymentDto.AccountId.HasValue)
+            {
+                payment.Account = await accountDataService.GetById(paymentDto.AccountId.Value);
+            }
+
             if (paymentDto.CategoryId.HasValue)
             {
                 payment.Category = await categoryDataService.GetById(paymentDto.CategoryId.Value);
             }
-            if (paymentDto.AccountId.HasValue)
-            {
-                payment.Category = await categoryDataService.GetById(paymentDto.AccountId.Value);
-            }
-
             await paymentDataService.SavePayments(payment);
         }
 
