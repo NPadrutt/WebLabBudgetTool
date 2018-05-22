@@ -21,5 +21,15 @@ namespace WebLabBudgetTool.Entities
         public virtual Category Category { get; set; }
 
         public virtual Account Account { get; set; }
+
+        /// <summary>
+        ///     This method checks if the payment is up for clearing and sets the
+        ///     flags accordingly.
+        /// </summary>
+        public void ClearPayment()
+        {
+            if (IsCleared) return;
+            IsCleared = Date.Date <= DateTime.Now.Date;
+        }
     }
 }

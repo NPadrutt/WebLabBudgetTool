@@ -61,15 +61,5 @@ namespace WebLabBudgetTool.QueryExtension
         {
             return query.Where(payment => payment.AccountId == accountId);
         }
-
-        /// <summary>
-        ///     Adds a filter to a query for payments who are not Transfers
-        /// </summary>
-        /// <param name="query">Existing query.</param>
-        /// <returns>Query filtered for payments who are not transfers.</returns>
-        public static IQueryable<Payment> WithoutTransfers(this IQueryable<Payment> query)
-        {
-            return query.Where(payment => payment.Type != PaymentType.Transfer);
-        }
     }
 }
