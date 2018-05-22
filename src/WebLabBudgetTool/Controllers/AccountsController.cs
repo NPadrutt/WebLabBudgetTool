@@ -10,7 +10,7 @@ using System;
 namespace WebLabBudgetTool.Controllers
 {
     [Route("api/[controller]")]
-    [Microsoft.AspNetCore.Cors.EnableCors("CorsPolicy")]
+    [Microsoft.AspNetCore.Cors.EnableCors("AllowEverything")]
     public class AccountsController
     {
         private readonly IAccountDataService accountDataService;
@@ -18,13 +18,6 @@ namespace WebLabBudgetTool.Controllers
         public AccountsController(IAccountDataService accountDataService)
         {
             this.accountDataService = accountDataService;
-        }
-
-        // OPTIONS api/Accounts
-        [HttpOptions]
-        public async Task<IEnumerable<AccountDto>> Options()
-        {
-            return Mapper.Map<List<AccountDto>>(await accountDataService.GetAllAccounts());
         }
 
         // GET api/Accounts

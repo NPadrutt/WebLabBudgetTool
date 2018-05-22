@@ -30,7 +30,22 @@ namespace WebLabBudgetTool
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             ApplicationContext.ConnectionString = connectionString;
             services.AddDbContext<ApplicationContext>(options => options.UseMySQL(connectionString));
+            services.AddCors();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowEverything",
+                                  policyBuilder => policyBuilder.AllowAnyOrigin()
+                                  .AllowAnyHeader()
+                                  .AllowAnyMethod());
+            });
+
             services.AddMvc();
+
+            services.Configure<Microsoft.AspNetCore.Mvc.MvcOptions>(options =>
+            {
+                options.Filters.Add(new Microsoft.AspNetCore.Mvc.Cors.Internal.CorsAuthorizationFilterFactory("AllowEverything"));
+            });
 
             // Create the container builder.
             var builder = new ContainerBuilder();
@@ -54,6 +69,8 @@ namespace WebLabBudgetTool
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors("AllowEverything");
 
             app.UseMvc();
             appLifetime.ApplicationStopped.Register(() => this.ApplicationContainer.Dispose());
