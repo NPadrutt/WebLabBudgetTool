@@ -6,8 +6,6 @@ namespace WebLabBudgetTool.Entities
 {
     public class Account
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
