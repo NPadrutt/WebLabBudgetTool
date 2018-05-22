@@ -30,6 +30,7 @@ namespace WebLabBudgetTool
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             ApplicationContext.ConnectionString = connectionString;
             services.AddDbContext<ApplicationContext>(options => options.UseMySQL(connectionString));
+            services.AddMvc();
 
             // Create the container builder.
             var builder = new ContainerBuilder();
