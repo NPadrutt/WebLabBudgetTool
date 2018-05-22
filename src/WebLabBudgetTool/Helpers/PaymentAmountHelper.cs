@@ -18,12 +18,11 @@ namespace WebLabBudgetTool.Helpers
         {
             if (!payment.IsCleared) return;
 
-            Func<double, double> amountFunc = x =>
-                payment.Type == PaymentType.Income
-                    ? x
-                    : -x;
+            payment.Account.CurrentBalance += payment.Type == PaymentType.Income
+                ? payment.Amount
+                : -payment.Amount;
 
-            payment.Account.CurrentBalance += amountFunc(payment.Amount);
+            payment.Account.IsOverdrawn = payment.Account.CurrentBalance < 0;
         }
 
         /// <summary>
@@ -36,12 +35,11 @@ namespace WebLabBudgetTool.Helpers
         {
             if (!payment.IsCleared) return;
 
-            Func<double, double> amountFunc = x =>
-                payment.Type == PaymentType.Income
-                    ? -x
-                    : x;
+            payment.Account.CurrentBalance += payment.Type == PaymentType.Income
+                ? -payment.Amount
+                : payment.Amount;
 
-            payment.Account.CurrentBalance += amountFunc(payment.Amount);
+            payment.Account.IsOverdrawn = payment.Account.CurrentBalance < 0;
         }
     }
 }
