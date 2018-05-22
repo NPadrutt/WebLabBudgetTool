@@ -37,7 +37,11 @@ namespace WebLabBudgetTool
 
             builder.RegisterType<AmbientDbContextLocator>().As<IAmbientDbContextLocator>();
             builder.RegisterType<DbContextScopeFactory>().As<IDbContextScopeFactory>();
-            builder.RegisterType<AccountDataService>().As<IAccountDataService>();
+
+            builder.RegisterAssemblyTypes(typeof(AccountDataService).Assembly)
+                   .Where(t => t.Name.EndsWith("Service", StringComparison.OrdinalIgnoreCase))
+                   .AsImplementedInterfaces();
+
             builder.RegisterInstance(Configuration);
 
             builder.Populate(services);
