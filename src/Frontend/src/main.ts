@@ -9,12 +9,11 @@ import 'vuetify/dist/vuetify.min.css'
 import colors from 'vuetify/es5/util/colors'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
-Vue.use(Vuetify);
-
 Vue.use(Vuetify, {
     theme: {
-        primary: colors.indigo,
-        secondary: colors.deepOrange,
+        primary: colors.deepPurple.base,
+        secondary: colors.deepOrange.base,
+        accent: colors.red.base,
     }
 });
 

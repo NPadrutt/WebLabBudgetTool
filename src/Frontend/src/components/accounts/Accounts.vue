@@ -51,6 +51,7 @@
         accountForForm: Account | null = null;
 
         mounted() {
+            this.$emit('mounted', 'Accounts');
             this.loadAccounts();
         }
 

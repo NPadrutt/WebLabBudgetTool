@@ -44,6 +44,7 @@
         categoryForForm: Category | null = null;
 
         mounted() {
+            this.$emit('mounted', 'Categories');
             this.loadCategories();
         }
 

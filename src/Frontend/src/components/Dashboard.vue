@@ -1,5 +1,5 @@
 <template>
-    <v-app id="inspire">
+    <v-app id="inspire" dark>
         <v-navigation-drawer
                 :clipped="$vuetify.breakpoint.lgAndUp"
                 v-model="drawer"
@@ -35,7 +35,7 @@
         </v-navigation-drawer>
         <v-toolbar
                 :clipped-left="$vuetify.breakpoint.lgAndUp"
-                color="indigo"
+                color="primary"
                 dark
                 fixed
                 permanent
@@ -56,9 +56,9 @@
 
         </v-toolbar>
         <v-content>
-            <router-view/>
+            <router-view @mounted="mountedChild"/>
         </v-content>
-        <v-footer color="indigo" app>
+        <v-footer color="primary" app>
             <span class="white--text">&copy; 2017</span>
         </v-footer>
     </v-app>
@@ -75,6 +75,10 @@
 
         title: string = 'WEBLAB Budget Tool';
         drawer: boolean = false;
+
+        mountedChild(title: string) {
+            this.title = title;
+        }
 
         logout() {
             AuthService.logout();

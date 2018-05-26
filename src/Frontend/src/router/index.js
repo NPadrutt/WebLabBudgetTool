@@ -9,7 +9,7 @@ import Login from '@/components/Login'
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
 	routes: [
 		{
 			path: '/login/:redirectTarget?',
@@ -21,32 +21,34 @@ export default new Router({
 			path: '/',
 			name: 'Dashboard',
 			component: Dashboard,
-			beforeEnter: requireAuthentication,
+			meta: {requiresAuthentication: true},
 			children: [
 				{
 					path: 'accounts',
 					name: 'Accounts',
 					component: Accounts,
-					beforeEnter: requireAuthentication
+					meta: {requiresAuthentication: true},
 				},
 				{
 					path: 'categories',
 					name: 'Categories',
 					component: Categories,
-					// beforeEnter: requireAuthentication
+					meta: {requiresAuthentication: true},
 				}, {
 					path: 'payments',
 					name: 'Payments',
 					component: Payments,
-					beforeEnter: requireAuthentication
+					meta: {requiresAuthentication: true},
 				}
 			]
 		},
 	]
-})
+});
 
-function requireAuthentication(to, from, next) {
-	if (!AuthService.loggedIn()) {
+router.beforeEach((to, from, next) => {
+	if (to.matched.some(record => record.meta.requiresAuthentication)
+		&& !AuthService.loggedIn()
+	) {
 		next({
 			name: 'Login',
 			params: {
@@ -56,4 +58,6 @@ function requireAuthentication(to, from, next) {
 	} else {
 		next()
 	}
-}
+});
+
+export default router;

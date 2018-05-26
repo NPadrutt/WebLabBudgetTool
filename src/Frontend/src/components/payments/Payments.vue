@@ -49,6 +49,7 @@
 
 
         mounted() {
+            this.$emit('mounted', 'Payments');
             Promise.all([this.loadPayments(), this.loadAccounts(), this.loadCategories()])
                 .then(values => Promise.all(values.map(value => value.json())))
                 .then(values => {
