@@ -1,5 +1,9 @@
 <template>
-    <v-dialog v-if="showForm" v-model="showForm">
+    <v-dialog
+            :value="value"
+            @input="cancel"
+            max-width="600px"
+    >
         <v-card>
             <v-card-title>
                 <div>
@@ -7,38 +11,53 @@
                 </div>
             </v-card-title>
             <v-card-text>
-                <v-layout row wrap>
-                    <v-flex xs12>
-                        <v-text-field
-                                v-model="account.name"
-                                label="Name"
-                        />
-                    </v-flex>
-                    <v-flex xs12>
-                        <v-text-field
-                                v-model.number="account.iban"
-                                label="IBAN"
-                                mask="AA## #### #### #### #### #"
-                        />
-                    </v-flex>
-                    <v-flex xs12>
-                        <v-text-field
-                                v-model.number="account.currentBalance"
-                                label="Kontostand"
-                                type="number"
-                        />
-                    </v-flex>
-                    <v-flex xs12>
-                        <v-text-field
-                                v-model="account.note"
-                                label="Notizen"
-                        />
-                    </v-flex>
-                </v-layout>
+                <v-form
+                        ref="form"
+                        v-if="account"
+                        v-model="validFormData"
+                >
+                    <v-container grid-list-md>
+                        <v-layout wrap>
+                            <v-flex xs12>
+                                <v-text-field
+                                        v-model="account.name"
+                                        label="Name"
+                                        :rules="[v => !!v || 'Give the account a name!']"
+                                        required
+                                />
+                            </v-flex>
+                            <v-flex xs12>
+                                <v-text-field
+                                        v-model.number="account.iban"
+                                        label="IBAN"
+                                        mask="AA## #### #### #### #### #"
+                                        :rules="[v => !!v || 'Make sure to provide the correct iban!']"
+                                        required
+                                />
+                            </v-flex>
+                            <v-flex xs12>
+                                <v-text-field
+                                        v-model.number="account.currentBalance"
+                                        label="Current Balance"
+                                        type="number"
+                                        :rules="[v => !!v || 'Give the accounts current balance!']"
+                                        required
+                                />
+                            </v-flex>
+                            <v-flex xs12>
+                                <v-text-field
+                                        v-model="account.note"
+                                        label="Notes"
+                                />
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-form>
             </v-card-text>
             <v-card-actions>
-                <v-btn flat @click="cancel">abbrechen</v-btn>
-                <v-btn flat @click="save">speichern</v-btn>
+                <v-spacer/>
+                <v-btn flat @click="cancel">cancel</v-btn>
+                <v-btn color="indigo" flat :disabled="!validFormData" @click="submit">save</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -54,14 +73,19 @@
         account: Account;
 
         @Prop()
-        showForm: boolean;
+        value: boolean;
 
-        cancel() {
-            this.$emit('cancel');
+        validFormData: boolean = true;
+
+        submit() {
+            if ((<HTMLFormElement>this.$refs.form).validate()) {
+                this.$emit('save', this.account)
+            }
         }
 
-        save() {
-            this.$emit('save', this.account)
+        cancel() {
+            (<HTMLFormElement>this.$refs.form).reset();
+            this.$emit('input');
         }
     }
 </script>

@@ -15,6 +15,7 @@ using WebLabBudgetTool.Entities;
 namespace WebLabBudgetTool.Controllers
 {
     [Route("api/[controller]")]
+    [Microsoft.AspNetCore.Cors.EnableCors("AllowEverything")]
     public class UserController : Controller
     {
         private readonly JWTSettings options;

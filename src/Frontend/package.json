@@ -13,6 +13,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "date-fns": "^1.29.0",
     "material-design-icons-iconfont": "^3.0.3",
     "ts-loader": "^3.5.0",
     "typescript": "^2.8.3",

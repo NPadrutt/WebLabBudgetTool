@@ -24,9 +24,8 @@
                     New Account
                 </v-btn>
                 <account-form
-                        :showForm="showForm"
+                        v-model="showForm"
                         :account="accountForForm"
-                        @cancel="cancelEdit"
                         @save="saveAccount"
                 />
             </v-flex>
@@ -43,23 +42,25 @@
 
     @Component({
         components: {
-            "account-form": AccountForm
+            AccountForm
         }
     })
     export default class Accounts extends Vue {
-        accounts: Account[] = [<Account>{
-            id: 0,
-            name: 'Sparkonto',
-            iban: 'CH22 8119 2000 0008 6592 4',
-            currentBalance: 2038.55,
-            note: "Persönliches Sparkonto",
-            isOverdrawn: false,
-            isExcluded: false
-        }];
-
+        accounts: Account[] = [];
         showForm: boolean = false;
         accountForForm: Account | null = null;
-        apiService: ApiService = new ApiService();
+
+        mounted() {
+            this.loadAccounts();
+        }
+
+        loadAccounts() {
+            ApiService.makeRequest('accounts')
+                .then(response => response.json())
+                .then(json => {
+                    this.accounts = json
+                });
+        }
 
         formatCurrency(value) {
             let val = (value / 1).toFixed(2);
@@ -71,7 +72,7 @@
                 id: 0,
                 name: '',
                 iban: '',
-                currentBalance: 0,
+                currentBalance: undefined,
                 note: '',
                 isOverdrawn: false,
                 isExcluded: false
@@ -90,10 +91,12 @@
         }
 
         saveAccount(account: Account) {
-            // TODO: implement save
-            let response = this.apiService.makeRequest('accounts', account, 'POST');
-            console.log(response);
-            this.showForm = false;
+            ApiService.makeRequest('accounts', account, 'POST')
+                .then(response => {
+                    this.loadAccounts();
+                    this.showForm = false;
+                });
+
         }
     }
 </script>

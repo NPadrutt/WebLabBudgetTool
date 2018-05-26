@@ -11,7 +11,7 @@ namespace WebLabBudgetTool.Controllers
 {
     [Authorize]
     [Route("api/[controller]")]
-    [Microsoft.AspNetCore.Cors.EnableCors("CorsPolicy")]
+    [Microsoft.AspNetCore.Cors.EnableCors("AllowEverything")]
     public class CategoriesController : Controller
     {
         private readonly ICategoryDataService categoryDataService;

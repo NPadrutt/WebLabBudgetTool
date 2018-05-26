@@ -1,14 +1,12 @@
 <template>
     <div id="app">
-        <dashboard/>
+        <router-view></router-view>
     </div>
 </template>
 
 <script lang="ts">
-    import Dashboard from "./components/Dashboard";
     export default {
-        name: 'App',
-        components: {Dashboard}
+        name: 'App'
     }
 </script>
 

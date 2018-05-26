@@ -18,9 +18,8 @@
                     New Category
                 </v-btn>
                 <category-form
-                        :showForm="showForm"
+                        v-model="showForm"
                         :category="categoryForForm"
-                        @cancel="cancelEdit"
                         @save="saveCategory"
                 />
             </v-flex>
@@ -40,27 +39,21 @@
         }
     })
     export default class Categories extends Vue {
-        categories: Category[] = [
-            <Category>{
-                id: 1,
-                name: 'Kategorie A',
-                note: 'Alles, das mit A anfängt...'
-            },
-            <Category>{
-                id: 2,
-                name: 'Kategorie B',
-                note: 'Alles, das mit B anfängt...'
-            },
-            <Category>{
-                id: 3,
-                name: 'Kategorie C',
-                note: 'Alles, das mit C anfängt...'
-            }
-        ];
-
+        categories: Category[] = [];
         showForm: boolean = false;
         categoryForForm: Category | null = null;
-        apiService: ApiService = new ApiService();
+
+        mounted() {
+            this.loadCategories();
+        }
+
+        loadCategories() {
+            ApiService.makeRequest('categories')
+                .then(response => response.json())
+                .then(json => {
+                    this.categories = json
+                });
+        }
 
         newCategory() {
             let category = <Category>{
@@ -82,9 +75,11 @@
         }
 
         saveCategory(category: Category) {
-            // TODO: implement save
-            let response = this.apiService.makeRequest('categories', category, 'POST');
-            this.showForm = false;
+            ApiService.makeRequest('categories', category, 'POST')
+                .then(response => {
+                    this.loadCategories();
+                    this.showForm = false;
+                });
         }
     }
 </script>

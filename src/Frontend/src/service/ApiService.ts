@@ -2,14 +2,27 @@ export default class ApiService {
 
     static readonly baseUrl = 'http://localhost:49180/api/';
 
-    async makeRequest(endpoint: string, payload: object, method: 'GET' | 'POST' | 'PUT' | 'DELETE') {
+    static async makeRequest(endpoint: string,
+                      payload: object | undefined = undefined,
+                      method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET') {
         let url = ApiService.baseUrl + endpoint;
-
-        return await fetch(url, {
+        let request = <RequestInit>{
             method: method,
-            body: JSON.stringify(payload),
             headers: {'Content-Type': 'application/json'},
             credentials: 'same-origin'
-        });
+        };
+
+        if (localStorage.accessToken !== undefined) {
+            if (request.headers === undefined) {
+                request.headers = {};
+            }
+            request.headers['Authorization'] = 'Bearer ' + localStorage.accessToken;
+        }
+
+        if (payload !== undefined) {
+            request['body'] = JSON.stringify(payload);
+        }
+
+        return await fetch(url, request);
     }
 }

@@ -3,6 +3,9 @@
     public enum PaymentType
     {
         Expense,
-        Income
+        Income,
+        Transfer,
+        Transfer_In,
+        Transfer_Out
     }
 }

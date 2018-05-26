@@ -6,9 +6,17 @@ import router from './router'
 
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
+import colors from 'vuetify/es5/util/colors'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
 Vue.use(Vuetify);
+
+Vue.use(Vuetify, {
+    theme: {
+        primary: colors.indigo,
+        secondary: colors.deepOrange,
+    }
+});
 
 Vue.config.productionTip = false;
 
