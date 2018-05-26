@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using WebLabBudgetTool.DataService;
 using WebLabBudgetTool.DataTransferObjects;
 using WebLabBudgetTool.Entities;
-using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebLabBudgetTool.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [Microsoft.AspNetCore.Cors.EnableCors("AllowEverything")]
-    public class AccountsController
+    public class AccountsController : Controller
     {
         private readonly IAccountDataService accountDataService;
 

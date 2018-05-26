@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebLabBudgetTool.DataService;
 using WebLabBudgetTool.DataTransferObjects;
 using WebLabBudgetTool.Entities;
-using System;
 
 namespace WebLabBudgetTool.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [Microsoft.AspNetCore.Cors.EnableCors("CorsPolicy")]
-    public class CategoriesController
+    public class CategoriesController : Controller
     {
         private readonly ICategoryDataService categoryDataService;
 

@@ -1,16 +1,19 @@
 ﻿using EntityFramework.DbContextScope.Interfaces;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WebLabBudgetTool.Entities;
 
 namespace WebLabBudgetTool
 {
-    public class ApplicationContext : DbContext, IDbContext
+    public sealed class ApplicationContext : IdentityDbContext<AppUser, AppRole, int, AppUserClaim, AppUserRole, AppUserLogin, AppRoleClaim, AppUserToken>, IDbContext
     {
         public ApplicationContext()
         {
         }
 
-        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options) { }
+        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
+        {
+        }
 
         public static string ConnectionString;
 
@@ -50,6 +53,8 @@ namespace WebLabBudgetTool
                         .HasIndex(b => b.Name);
             modelBuilder.Entity<Category>()
                         .HasIndex(b => b.Name);
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

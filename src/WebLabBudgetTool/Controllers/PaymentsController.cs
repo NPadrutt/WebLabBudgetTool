@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebLabBudgetTool.DataService;
 using WebLabBudgetTool.DataTransferObjects;
@@ -8,9 +9,10 @@ using WebLabBudgetTool.Entities;
 
 namespace WebLabBudgetTool.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [Microsoft.AspNetCore.Cors.EnableCors("CorsPolicy")]
-    public class PaymentsController
+    public class PaymentsController : Controller
     {
         private readonly IPaymentDataService paymentDataService;
         private readonly IAccountDataService accountDataService;

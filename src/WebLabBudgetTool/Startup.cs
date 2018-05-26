@@ -1,14 +1,22 @@
 ﻿using System;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using EntityFramework.DbContextScope;
 using EntityFramework.DbContextScope.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using WebLabBudgetTool.DataService;
+using WebLabBudgetTool.Entities;
 
 namespace WebLabBudgetTool
 {
@@ -26,10 +34,46 @@ namespace WebLabBudgetTool
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.Configure<JWTSettings>(Configuration.GetSection("JWTSettings"));
             // We have to set the connection string twice here to init the context afterwards correctly for the ambient context.
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             ApplicationContext.ConnectionString = connectionString;
             services.AddDbContext<ApplicationContext>(options => options.UseMySQL(connectionString));
+
+            services.AddIdentity<AppUser, AppRole>()
+                    .AddEntityFrameworkStores<ApplicationContext>()
+                    .AddDefaultTokenProviders();
+
+            services.ConfigureApplicationCookie(options =>
+                {
+                    // avoid redirecting REST clients on 401
+                    options.Events = new CookieAuthenticationEvents
+                    {
+                        OnRedirectToLogin = ctx =>
+                        {
+                            ctx.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
+                            return Task.FromResult(0);
+                        }
+                    };
+                }
+            );
+
+            services.AddAuthentication(o => { o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; })
+                    .AddJwtBearer(options =>
+                    {
+                        options.RequireHttpsMetadata = false;
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            ValidIssuer = "weblab_budget_tool",
+                            ValidAudience = "weblab_budget_tool",
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("weblab-is-awesome"))
+                        };
+                    });
+
             services.AddCors();
 
             services.AddCors(options =>
@@ -74,6 +118,7 @@ namespace WebLabBudgetTool
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseAuthentication();
             app.UseCors("AllowEverything");
 
             app.UseMvc();
