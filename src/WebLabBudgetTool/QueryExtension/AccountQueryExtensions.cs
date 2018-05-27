@@ -41,6 +41,17 @@ namespace WebLabBudgetTool.QueryExtension
         }
 
         /// <summary>
+        ///     Adds a filter to a query to find all accounts assigned to the passed user.
+        /// </summary>
+        /// <param name="query">Existing query.</param>
+        /// <param name="user">User to filter for</param>
+        /// <returns>Query with the added filter.</returns>
+        public static IQueryable<Account> IsAssignedToUser(this IQueryable<Account> query, AppUser user)
+        {
+            return query.Where(x => x.User.Equals(user));
+        }
+
+        /// <summary>
         ///     Ordery an account query by the name.
         /// </summary>
         /// <param name="query">Existing query.</param>

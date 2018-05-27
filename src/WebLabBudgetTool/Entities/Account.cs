@@ -16,5 +16,6 @@ namespace WebLabBudgetTool.Entities
         public bool IsExcluded { get; set; }
 
         public virtual List<Payment> Payments { get; set; }
+        public virtual AppUser User { get; set; }
     }
 }

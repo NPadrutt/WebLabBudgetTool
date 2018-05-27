@@ -22,6 +22,8 @@ namespace WebLabBudgetTool.Entities
 
         public virtual Account Account { get; set; }
 
+        public virtual AppUser User { get; set; }
+
         /// <summary>
         ///     This method checks if the payment is up for clearing and sets the
         ///     flags accordingly.

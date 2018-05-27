@@ -52,6 +52,17 @@ namespace WebLabBudgetTool.QueryExtension
         }
 
         /// <summary>
+        ///     Adds a filter to a query to find all payments assigned to the passed user.
+        /// </summary>
+        /// <param name="query">Existing query.</param>
+        /// <param name="user">User to filter for</param>
+        /// <returns>Query with the added filter.</returns>
+        public static IQueryable<Payment> IsAssignedToUser(this IQueryable<Payment> query, AppUser user)
+        {
+            return query.Where(x => x.User.Equals(user));
+        }
+
+        /// <summary>
         ///     Adds a filter to a query for payments who has a certain id as charged or target account.
         /// </summary>
         /// <param name="query">Existing query.</param>

@@ -12,5 +12,6 @@ namespace WebLabBudgetTool.Entities
         public string Note { get; set; }
 
         public virtual List<Payment> Payments { get; set; }
+        public virtual AppUser User { get; set; }
     }
 }

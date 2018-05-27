@@ -17,34 +17,16 @@ namespace WebLabBudgetTool.DataService
         ///     Returns a list with all accounts.
         /// </summary>
         /// <returns>Returns a IEnumerable with all accounts.</returns>
-        Task<IEnumerable<Account>> GetAllAccounts();
+        Task<IEnumerable<Account>> GetAllAccounts(AppUser user);
 
         /// <summary>
         ///     Returns a Account searched by ID.
         /// </summary>
         /// <param name="id">Id to select the account for.</param>
+        /// <param name="user">Current logged in user.</param>
         /// <returns>The selected Account</returns>
-        Task<Account> GetById(int id);
+        Task<Account> GetById(int id, AppUser user);
        
-        /// <summary>
-        ///     Checks if the name is already taken by another account.
-        /// </summary>
-        /// <param name="name">Name to look for.</param>
-        /// <returns>if account name is already taken.</returns>
-        Task<bool> CheckIfNameAlreadyTaken(string name);
-
-        /// <summary>
-        ///     Returns a list with all not excluded Accounts.
-        /// </summary>
-        /// <returns>List with all not excluded Accounts.</returns>
-        Task<IEnumerable<Account>> GetNotExcludedAccounts();
-
-        /// <summary>
-        ///     Returns a list with all excluded Accounts.
-        /// </summary>
-        /// <returns>List with all  excluded Accounts.</returns>
-        Task<IEnumerable<Account>> GetExcludedAccounts();
-
         /// <summary>
         ///     Save the passed account.
         /// </summary>
@@ -53,7 +35,9 @@ namespace WebLabBudgetTool.DataService
         /// <summary>
         ///     Deletes the passed account with the passed id and all associated payments.
         /// </summary>
-        Task DeleteAccount(int accountId);
+        /// <param name="accountId">Id of the account to delete.</param>
+        /// <param name="user">Current logged in user.</param>
+        Task DeleteAccount(int accountId, AppUser user);
     }
 
     public class AccountDataService : IAccountDataService
@@ -68,13 +52,14 @@ namespace WebLabBudgetTool.DataService
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Account>> GetAllAccounts()
+        public async Task<IEnumerable<Account>> GetAllAccounts(AppUser user)
         {
             using (dbContextScopeFactory.CreateReadOnly())
             {
                 using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
                 {
                     var list = await dbContext.Accounts
+                                              .IsAssignedToUser(user)
                                               .OrderByName()
                                               .ToListAsync();
 
@@ -82,65 +67,18 @@ namespace WebLabBudgetTool.DataService
                 }
             }
         }/// <inheritdoc />
-        public async Task<Account> GetById(int id)
+        public async Task<Account> GetById(int id, AppUser user)
         {
             using (dbContextScopeFactory.CreateReadOnly())
             {
                 using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
                 {
                     var account = await dbContext.Accounts
+                                                 .IsAssignedToUser(user)
                                                  .Include(x => x.Payments).ThenInclude(p => p.Category)
                                                  .FirstOrDefaultAsync(x => x.Id == id);
 
                     return account;
-                }
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> CheckIfNameAlreadyTaken(string name)
-        {
-            using (dbContextScopeFactory.CreateReadOnly())
-            {
-                using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
-                {
-                    return await dbContext.Accounts
-                                                  .NameEquals(name)
-                                                  .AnyAsync();
-                }
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<Account>> GetNotExcludedAccounts()
-        {
-            using (dbContextScopeFactory.CreateReadOnly())
-            {
-                using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
-                {
-                    var list = await dbContext.Accounts
-                        .AreNotExcluded()
-                        .OrderByName()
-                        .ToListAsync();
-
-                    return list.ToList();
-                }
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<Account>> GetExcludedAccounts()
-        {
-            using (dbContextScopeFactory.CreateReadOnly())
-            {
-                using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
-                {
-                    var list = await dbContext.Accounts
-                        .AreExcluded()
-                        .OrderByName()
-                        .ToListAsync();
-
-                    return list.ToList();
                 }
             }
         }
@@ -161,13 +99,13 @@ namespace WebLabBudgetTool.DataService
         }
 
         /// <inheritdoc />
-        public async Task DeleteAccount(int accountId)
+        public async Task DeleteAccount(int accountId, AppUser user)
         {
             using (var dbContextScope = dbContextScopeFactory.Create())
             {
                 using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
                 {
-                    var account = GetById(accountId);
+                    var account = GetById(accountId, user);
 
                     dbContext.Entry(account).State = EntityState.Deleted;
                     await dbContextScope.SaveChangesAsync();

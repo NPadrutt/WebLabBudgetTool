@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using EntityFramework.DbContextScope.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -16,32 +15,25 @@ namespace WebLabBudgetTool.DataService
     public interface IPaymentDataService
     {
         /// <summary>
-        ///     Returns all payments assosciated to the passed account Id as charged or target.
-        /// </summary>
-        /// <param name="accountId">Id of the account to load.</param>
-        /// <returns>List of Payments</returns>
-        Task<IEnumerable<Payment>> GetPaymentsByAccountId(int accountId);
-
-        /// <summary>
         ///     Returns all payments.
         /// </summary>
         /// <returns>List of Payments</returns>
-        Task<IEnumerable<Payment>> GetAllPayments();
+        Task<IEnumerable<Payment>> GetAllPayments(AppUser user);
 
         /// <summary>
         ///     Returns all uncleared payments up to the passed enddate who are assigned to the passed Account ID.
         /// </summary>
         /// <param name="enddate">Enddate</param>
-        /// <param name="accountId">Account to select payments for.</param>
         /// <returns>List of Payments.</returns>
-        Task<IEnumerable<Payment>> GetUnclearedPayments(DateTime enddate, int accountId = 0);
+        Task<IEnumerable<Payment>> GetUnclearedPayments(DateTime enddate);
 
         /// <summary>
         ///     Returns a payment searched by ID.
         /// </summary>
         /// <param name="id">Id to select the payment for.</param>
+        /// <param name="user">Logged In user.</param>
         /// <returns>The selected payment</returns>
-        Task<Payment> GetById(int id);
+        Task<Payment> GetById(int id, AppUser user);
 
         /// <summary>
         ///     Saves or updates a one or more payments to the database.
@@ -53,7 +45,8 @@ namespace WebLabBudgetTool.DataService
         ///     Deletes the payment wit the passed ID from the dataabase.
         /// </summary>
         /// <param name="id">Id of the payment to delete.</param>
-        Task DeletePayment(int id);
+        /// <param name="user">Logged In user.</param>
+        Task DeletePayment(int id, AppUser user);
     }
 
     /// <inheritdoc />
@@ -70,29 +63,15 @@ namespace WebLabBudgetTool.DataService
             this.dbContextScopeFactory = dbContextScopeFactory;
             this.ambientDbContextLocator = ambientDbContextLocator;
         }
-        
-        /// <inheritdoc />
-        public async Task<IEnumerable<Payment>> GetPaymentsByAccountId(int accountId)
-        {
-            using (dbContextScopeFactory.CreateReadOnly())
-            {
-                using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
-                {
-                    return await dbContext.Payments
-                        .Include(x => x.Category)
-                        .HasAccountId(accountId)
-                        .ToListAsync();
-                }
-            }
-        }
 
-        public async Task<IEnumerable<Payment>> GetAllPayments()
+        public async Task<IEnumerable<Payment>> GetAllPayments(AppUser user)
         {
             using (dbContextScopeFactory.CreateReadOnly())
             {
                 using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
                 {
                     return await dbContext.Payments
+                                          .IsAssignedToUser(user)
                                           .Include(x => x.Category)
                                           .ToListAsync();
                 }
@@ -100,7 +79,7 @@ namespace WebLabBudgetTool.DataService
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Payment>> GetUnclearedPayments(DateTime enddate, int accountId = 0)
+        public async Task<IEnumerable<Payment>> GetUnclearedPayments(DateTime enddate)
         {
             using (dbContextScopeFactory.CreateReadOnly())
             {
@@ -112,11 +91,6 @@ namespace WebLabBudgetTool.DataService
                                          .AreNotCleared()
                                          .HasDateSmallerEqualsThan(enddate);
 
-                    if (accountId != 0)
-                    {
-                        query = query.HasAccountId(accountId);
-                    }
-
                     return await query
                         .ToListAsync();
                 }
@@ -124,13 +98,14 @@ namespace WebLabBudgetTool.DataService
         }
 
         /// <inheritdoc />
-        public async Task<Payment> GetById(int id)
+        public async Task<Payment> GetById(int id, AppUser user)
         {
             using (dbContextScopeFactory.CreateReadOnly())
             {
                 using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
                 {
                     var payment = await dbContext.Payments
+                                                 .IsAssignedToUser(user)
                                                  .Include(x => x.Account)
                                                  .Include(x => x.Category)
                                                  .FirstAsync(x => x.Id == id);
@@ -156,13 +131,13 @@ namespace WebLabBudgetTool.DataService
         }
 
         /// <inheritdoc />
-        public async Task DeletePayment(int id)
+        public async Task DeletePayment(int id, AppUser user)
         {
             using (var dbContextScope = dbContextScopeFactory.Create())
             {
                 using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
                 {
-                    var payment = await GetById(id);
+                    var payment = await GetById(id, user);
                     PaymentAmountHelper.RemovePaymentAmount(payment);
 
                     var paymentEntry = dbContext.Entry(payment);

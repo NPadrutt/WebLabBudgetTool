@@ -42,6 +42,17 @@ namespace WebLabBudgetTool.QueryExtension
         }
 
         /// <summary>
+        ///     Adds a filter to a query to find all categories assigned to the passed user.
+        /// </summary>
+        /// <param name="query">Existing query.</param>
+        /// <param name="user">User to filter for</param>
+        /// <returns>Query with the added filter.</returns>
+        public static IQueryable<Category> IsAssignedToUser(this IQueryable<Category> query, AppUser user)
+        {
+            return query.Where(x => x.User.Equals(user));
+        }
+
+        /// <summary>
         ///      Ordery a category query by name.
         /// </summary>
         /// <param name="query">Existing query.</param>

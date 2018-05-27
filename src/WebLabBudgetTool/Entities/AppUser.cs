@@ -1,10 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 
 namespace WebLabBudgetTool.Entities
 {
     public class AppUser : IdentityUser<int>
     {
+        public virtual List<Payment> Payments { get; set; }
+        public virtual List<Account> Accounts { get; set; }
+        public virtual List<Category> Categories { get; set; }
     }
 
     public class AppRole : IdentityRole<int> { }

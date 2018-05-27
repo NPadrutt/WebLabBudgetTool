@@ -36,9 +36,13 @@ namespace WebLabBudgetTool.Migrations
 
                     b.Property<string>("Note");
 
+                    b.Property<int?>("UserId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Accounts");
                 });
@@ -166,8 +170,6 @@ namespace WebLabBudgetTool.Migrations
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
-                    b.HasAlternateKey("Id");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserLogins");
@@ -200,8 +202,6 @@ namespace WebLabBudgetTool.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.HasAlternateKey("Id");
-
                     b.ToTable("AspNetUserTokens");
                 });
 
@@ -215,9 +215,13 @@ namespace WebLabBudgetTool.Migrations
 
                     b.Property<string>("Note");
 
+                    b.Property<int?>("UserId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Categories");
                 });
@@ -241,13 +245,24 @@ namespace WebLabBudgetTool.Migrations
 
                     b.Property<int>("Type");
 
+                    b.Property<int?>("UserId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AccountId");
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("WebLabBudgetTool.Entities.Account", b =>
+                {
+                    b.HasOne("WebLabBudgetTool.Entities.AppUser", "User")
+                        .WithMany("Accounts")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("WebLabBudgetTool.Entities.AppRoleClaim", b =>
@@ -295,6 +310,13 @@ namespace WebLabBudgetTool.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("WebLabBudgetTool.Entities.Category", b =>
+                {
+                    b.HasOne("WebLabBudgetTool.Entities.AppUser", "User")
+                        .WithMany("Categories")
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("WebLabBudgetTool.Entities.Payment", b =>
                 {
                     b.HasOne("WebLabBudgetTool.Entities.Account", "Account")
@@ -306,6 +328,10 @@ namespace WebLabBudgetTool.Migrations
                         .WithMany("Payments")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("WebLabBudgetTool.Entities.AppUser", "User")
+                        .WithMany("Payments")
+                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }

@@ -17,21 +17,14 @@ namespace WebLabBudgetTool.DataService
         ///     Returns all categories
         /// </summary>
         /// <returns>List with all categories.</returns>
-        Task<IEnumerable<Category>> GetAllCategories();
+        Task<IEnumerable<Category>> GetAllCategories(AppUser user);
 
         /// <summary>
         ///     Looks up the category with the passed id and returns it.
         /// </summary>
         /// <param name="id">Id to look for.</param>
         /// <returns>Found Id.</returns>
-        Task<Category> GetById(int id);
-
-        /// <summary>
-        ///     Checks if the name is already taken by another category.
-        /// </summary>
-        /// <param name="name">Name to look for.</param>
-        /// <returns>If category name is already taken.</returns>
-        Task<bool> CheckIfNameAlreadyTaken(string name);
+        Task<Category> GetById(int id, AppUser user);
 
         /// <summary>
         ///     Save the passed category.
@@ -43,7 +36,7 @@ namespace WebLabBudgetTool.DataService
         ///     Deletes the category with the passed Id and sets references to it to null.
         /// </summary>
         /// <param name="id">Id of the catgory to delete.</param>
-        Task DeleteCategory(int id);
+        Task DeleteCategory(int id, AppUser user);
     }
 
     /// <summary>
@@ -65,13 +58,14 @@ namespace WebLabBudgetTool.DataService
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Category>> GetAllCategories()
+        public async Task<IEnumerable<Category>> GetAllCategories(AppUser user)
         {
             using (dbContextScopeFactory.CreateReadOnly())
             {
                 using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
                 {
                     var list = await dbContext.Categories
+                                              .IsAssignedToUser(user)
                                               .OrderByName()
                                               .ToListAsync();
 
@@ -81,28 +75,17 @@ namespace WebLabBudgetTool.DataService
         }
 
         /// <inheritdoc />
-        public async Task<Category> GetById(int id)
+        public async Task<Category> GetById(int id, AppUser user)
         {
             using (dbContextScopeFactory.CreateReadOnly())
             {
                 using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
                 {
-                    var category = await dbContext.Categories.FindAsync(id);
-                    return category == null ? null : new Category();
-                }
-            }
-        }
+                    var category = await dbContext.Categories
+                                                  .IsAssignedToUser(user)
+                                                  .FirstOrDefaultAsync(x => x.Id == id);
 
-        /// <inheritdoc />
-        public async Task<bool> CheckIfNameAlreadyTaken(string name)
-        {
-            using (dbContextScopeFactory.CreateReadOnly())
-            {
-                using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
-                {
-                    return await dbContext.Categories
-                                          .NameEquals(name)
-                                          .AnyAsync();
+                    return category == null ? null : new Category();
                 }
             }
         }
@@ -124,13 +107,13 @@ namespace WebLabBudgetTool.DataService
         }
 
         /// <inheritdoc />
-        public async Task DeleteCategory(int id)
+        public async Task DeleteCategory(int id, AppUser user)
         {
             using (var dbContextScope = dbContextScopeFactory.Create())
             {
                 using (var dbContext = ambientDbContextLocator.Get<ApplicationContext>())
                 {
-                    dbContext.Entry(await GetById(id)).State = EntityState.Deleted;
+                    dbContext.Entry(await GetById(id, user)).State = EntityState.Deleted;
                     await dbContextScope.SaveChangesAsync();
                 }
             }
