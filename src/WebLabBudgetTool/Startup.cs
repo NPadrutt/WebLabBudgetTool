@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
+using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using EntityFramework.DbContextScope;
 using EntityFramework.DbContextScope.Interfaces;
@@ -75,7 +78,7 @@ namespace WebLabBudgetTool
                     });
 
             services.AddCors();
-
+            
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowEverything",
@@ -105,13 +108,13 @@ namespace WebLabBudgetTool
 
             builder.Populate(services);
             this.ApplicationContainer = builder.Build();
-
+            
             // Create the IServiceProvider based on the container.
             return new AutofacServiceProvider(this.ApplicationContainer);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
         {
             if (env.IsDevelopment())
             {
@@ -123,6 +126,30 @@ namespace WebLabBudgetTool
 
             app.UseMvc();
             appLifetime.ApplicationStopped.Register(() => this.ApplicationContainer.Dispose());
+            await StartClearJob();
+        }
+
+        private async Task StartClearJob()
+        {
+            await Task.Run(async () => {
+                while (true)
+                {
+                    var paymentDataServices = ApplicationContainer.Resolve<IPaymentDataService>();
+                    var payments = (await paymentDataServices.GetUnclearedPayments(DateTime.Now)).ToList();
+
+                    foreach (var payment in payments)
+                    {
+                        payment.ClearPayment();
+                    }
+
+                    await paymentDataServices.SavePayments(payments.ToArray());
+
+                    // Sleep for 3 hours
+                    Thread.Sleep(new TimeSpan(3,0,0));
+
+                }
+
+            });
         }
     }
 }
