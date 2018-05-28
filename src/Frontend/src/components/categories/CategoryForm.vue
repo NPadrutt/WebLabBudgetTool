@@ -6,9 +6,7 @@
     >
         <v-card>
             <v-card-title>
-                <div>
-                    <h3 class="headline">Category</h3>
-                </div>
+                <h3 class="headline primary--text">Category</h3>
             </v-card-title>
             <v-card-text>
                 <v-form
@@ -39,7 +37,7 @@
             <v-card-actions>
                 <v-spacer/>
                 <v-btn flat @click="cancel">cancel</v-btn>
-                <v-btn color="indigo" flat :disabled="!validFormData" @click="submit">save</v-btn>
+                <v-btn color="primary" flat :disabled="!validFormData" @click="submit">save</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

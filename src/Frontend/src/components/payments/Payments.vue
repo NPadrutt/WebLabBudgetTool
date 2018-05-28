@@ -6,8 +6,9 @@
                         :payments="payments"
                 />
             </v-flex>
-            <v-flex xs12>
-                <v-btn @click="newPayment">
+        </v-layout>
+        <v-layout justify-center class="mt-5">
+                <v-btn color="primary" @click="newPayment">
                     Add Payment
                 </v-btn>
                 <payment-form
@@ -17,7 +18,6 @@
                         :categories="categories"
                         @save="savePayment"
                 />
-            </v-flex>
         </v-layout>
     </v-container>
 </template>

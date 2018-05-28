@@ -1,34 +1,44 @@
+<style>
+    .jumbotron__background {
+        box-shadow: inset 0 0 10px 0 black;
+    }
+</style>
+
 <template>
-    <v-container>
-        <v-layout row wrap>
-            <v-flex xs12 sm6 pa-1 v-for="account of accounts" :key="account.id">
-                <v-card>
-                    <v-card-title primary-title>
-                        <div>
-                            <h3 class="headline mb-0">{{account.name}}</h3>
-                            <div class="grey--text">{{account.iban}}</div>
-                        </div>
-                    </v-card-title>
-                    <v-card-text>
-                        <div>
-                            <p>{{account.note}}</p>
-                            <p class="title text-xs-right">{{formatCurrency(account.currentBalance)}}</p>
-                        </div>
-                    </v-card-text>
-                </v-card>
+    <v-container class="pa-0">
+        <v-layout>
+            <v-flex xs12>
+                <v-container grid-list-lg>
+                    <v-layout row wrap>
+                        <v-flex xs12 md6 v-for="account of accounts" :key="account.id" flexbox>
+                            <v-card height="100%">
+                                <v-card-title primary-title>
+                                    <div>
+                                        <h3 class="headline mb-0">{{account.name}}</h3>
+                                        <div class="grey--text">{{account.iban}}</div>
+                                    </div>
+                                </v-card-title>
+                                <v-card-text>
+                                    <div>
+                                        <p>{{account.note}}</p>
+                                        <p class="headline text-xs-right">{{formatCurrency(account.currentBalance)}}</p>
+                                    </div>
+                                </v-card-text>
+                            </v-card>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
             </v-flex>
         </v-layout>
-        <v-layout row wrap>
-            <v-flex>
-                <v-btn @click="newAccount">
-                    New Account
-                </v-btn>
-                <account-form
-                        v-model="showForm"
-                        :account="accountForForm"
-                        @save="saveAccount"
-                />
-            </v-flex>
+        <v-layout justify-center>
+            <v-btn color="primary" @click="newAccount">
+                New Account
+            </v-btn>
+            <account-form
+                    v-model="showForm"
+                    :account="accountForForm"
+                    @save="saveAccount"
+            />
         </v-layout>
     </v-container>
 </template>
