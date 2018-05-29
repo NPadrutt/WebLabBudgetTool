@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using WebLabBudgetTool.DataTransferObjects;
 using WebLabBudgetTool.Entities;
 
@@ -16,7 +17,9 @@ namespace WebLabBudgetTool
                 cfg.CreateMap<Category, CategoryDto>();
                 cfg.CreateMap<CategoryDto, Category>();
 
-                cfg.CreateMap<Payment, PaymentDto>();
+                cfg.CreateMap<Payment, PaymentDto>()
+                   .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date.ToString("d")));
+
                 cfg.CreateMap<PaymentDto, Payment>();
             });
         }
