@@ -16,9 +16,7 @@
     >
         <v-card>
             <v-card-title>
-                <div>
-                    <h3 class="headline">Payment</h3>
-                </div>
+                <h3 class="headline primary--text">Payment</h3>
             </v-card-title>
             <v-card-text>
                 <v-form
@@ -48,39 +46,40 @@
                                         :label="getAccountLabel()"
                                         item-text="name"
                                         item-value="id"
+                                        autocomplete
                                         single-line
                                         :rules="[v => !!v || 'Please choose an account!']"
                                         required
                                 ></v-select>
                             </v-flex>
-                            <v-flex xs12>
+                            <v-flex xs12 v-if="payment.type === paymentTypes.TRANSFER">
                                 <v-select
-                                        v-if="payment.type === paymentTypes.TRANSFER"
                                         :items="accounts"
                                         v-model="transferTargetAccountId"
                                         label="Target account"
                                         item-text="name"
                                         item-value="id"
+                                        autocomplete
                                         single-line
                                         :rules="[v => !!v || 'Please choose an account!']"
                                         required
                                 ></v-select>
                             </v-flex>
-                            <v-flex xs12>
+                            <v-flex xs12 v-if="payment.type !== paymentTypes.TRANSFER">
                                 <v-select
-                                        v-if="payment.type !== paymentTypes.TRANSFER"
                                         :items="categories"
                                         v-model="payment.categoryId"
                                         label="Category"
                                         item-text="name"
                                         item-value="id"
-                                        single-line
                                         autocomplete
+                                        single-line
+                                        required
                                 ></v-select>
                             </v-flex>
                             <v-flex xs12>
                                 <date-picker
-                                        :date="payment.date"
+                                        v-model="payment.date"
                                         label="Date"
                                         :rules="[v => !!v || 'Please choose a date!']"
                                         required
@@ -109,14 +108,14 @@
             <v-card-actions>
                 <v-spacer/>
                 <v-btn flat @click="cancel">cancel</v-btn>
-                <v-btn color="indigo" flat :disabled="!validFormData" @click="submit">save</v-btn>
+                <v-btn color="primary" flat :disabled="!validFormData" @click="submit">save</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
 </template>
 
 <script lang="ts">
-    import {Component, Emit, Inject, Model, Prop, Provide, Vue, Watch} from 'vue-property-decorator'
+    import {Component, Prop, Vue} from 'vue-property-decorator'
     import {PaymentType, PaymentWithReferences} from "../../types/Payment";
     import DatePicker from "../DatePicker";
     import {Category} from "../../types/Category";
@@ -142,7 +141,7 @@
 
         paymentTypes = PaymentType;
 
-        transferTargetAccountId?: Account = undefined;
+        transferTargetAccountId?: Account = <Account>{};
 
         getAccountLabel() {
             return this.payment.type === PaymentType.INCOME ? 'Target Account' : 'Source Account';
@@ -151,6 +150,8 @@
         submit() {
             if ((<HTMLFormElement>this.$refs.form).validate()) {
                 this.$emit('save', this.payment, this.transferTargetAccountId);
+                (<HTMLFormElement>this.$refs.form).reset();
+                this.payment = <PaymentWithReferences>{};
             }
         }
 

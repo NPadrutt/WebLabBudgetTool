@@ -1,28 +1,32 @@
 <template>
-    <v-container>
-        <v-layout row wrap>
-            <v-flex xs12 sm6 pa-1 v-for="category of categories" :key="category.id">
-                <v-card>
-                    <v-card-title primary-title>
-                        <h3 class="headline mb-0">{{category.name}}</h3>
-                    </v-card-title>
-                    <v-card-text>
-                        <p>{{category.note}}</p>
-                    </v-card-text>
-                </v-card>
+    <v-container class="pa-0">
+        <v-layout>
+            <v-flex xs12>
+                <v-container grid-list-lg>
+                    <v-layout row wrap>
+                        <v-flex xs12 md6 v-for="category of categories" :key="category.id" flexbox>
+                            <v-card height="100%">
+                                <v-card-title primary-title>
+                                    <h3 class="headline mb-0">{{category.name}}</h3>
+                                </v-card-title>
+                                <v-card-text>
+                                    <p>{{category.note}}</p>
+                                </v-card-text>
+                            </v-card>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
             </v-flex>
         </v-layout>
-        <v-layout row wrap>
-            <v-flex>
-                <v-btn @click="newCategory">
-                    New Category
-                </v-btn>
-                <category-form
-                        v-model="showForm"
-                        :category="categoryForForm"
-                        @save="saveCategory"
-                />
-            </v-flex>
+        <v-layout justify-center>
+            <v-btn color="primary" @click="newCategory">
+                New Category
+            </v-btn>
+            <category-form
+                    v-model="showForm"
+                    :category="categoryForForm"
+                    @save="saveCategory"
+            />
         </v-layout>
     </v-container>
 </template>

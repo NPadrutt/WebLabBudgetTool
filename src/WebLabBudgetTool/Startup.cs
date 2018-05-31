@@ -134,18 +134,27 @@ namespace WebLabBudgetTool
             await Task.Run(async () => {
                 while (true)
                 {
-                    var paymentDataServices = ApplicationContainer.Resolve<IPaymentDataService>();
-                    var payments = (await paymentDataServices.GetUnclearedPayments(DateTime.Now)).ToList();
-
-                    foreach (var payment in payments)
+                    try
                     {
-                        payment.ClearPayment();
+                        var paymentDataServices = ApplicationContainer.Resolve<IPaymentDataService>();
+                        var payments = (await paymentDataServices.GetUnclearedPayments(DateTime.Now)).ToList();
+
+                        foreach (var payment in payments)
+                        {
+                            payment.ClearPayment();
+                        }
+
+                        await paymentDataServices.SavePayments(payments.ToArray());
+
                     }
-
-                    await paymentDataServices.SavePayments(payments.ToArray());
-
-                    // Sleep for 3 hours
-                    Thread.Sleep(new TimeSpan(3,0,0));
+                    catch (Exception ex)
+                    {
+                    }
+                    finally
+                    {
+                        // Sleep for 3 hours
+                        Thread.Sleep(new TimeSpan(3, 0, 0));
+                    }
 
                 }
 

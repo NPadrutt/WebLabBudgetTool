@@ -20,6 +20,7 @@
             <td class="text-xs-left">{{ formatDate(props.item.date) }}</td>
             <td class="text-xs-left">{{ props.item.account.name }}</td>
             <td class="text-xs-left">{{ props.item.category ? props.item.category.name : '-'}}</td>
+            <td class="text-xs-left">{{ props.item.note}}</td>
             <td class="text-xs-right">{{ formatCurrency(props.item.amount) }}</td>
             <td class="text-xs-center">
                 <i class="material-icons" v-if="props.item.isCleared">check</i>
@@ -51,13 +52,15 @@
             {text: 'Date', value: 'date'},
             {text: 'Account', value: 'account.name'},
             {text: 'Category', value: 'category.name'},
+            {text: 'Notes', value: 'note'},
             {text: 'Amount', value: 'amount', align: 'right'},
             {text: 'Is Cleared', value: 'isCleared', align: 'center'},
             {text: 'Type', value: 'paymentType', align: 'center'}
         ];
 
-        formatCurrency(currency: number) {
-            return currency.toFixed(2);
+        formatCurrency(value: number) {
+            let val = (value / 1).toFixed(2);
+            return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'")
         }
 
         formatDate(date: Date) {

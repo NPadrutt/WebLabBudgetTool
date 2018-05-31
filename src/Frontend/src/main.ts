@@ -11,7 +11,7 @@ import 'material-design-icons-iconfont/dist/material-design-icons.css'
 
 Vue.use(Vuetify, {
     theme: {
-        primary: colors.deepPurple.base,
+        primary: colors.blue.lighten1,
         secondary: colors.deepOrange.base,
         accent: colors.red.base,
     }
